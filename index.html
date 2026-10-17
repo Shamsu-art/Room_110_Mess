@@ -656,7 +656,7 @@
         badge.className = "badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1";
         badge.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>CLOSED';
       } else {
-        badge.className = "badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-2 py-1";
+        badge.className, "badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-2 py-1";
         badge.innerHTML = '<i class="bi bi-clock-history me-1"></i>PENDING';
       }
       badge.classList.remove('d-none');
@@ -683,14 +683,17 @@
           let balText = balSign + 'AED ' + Math.abs(net).toFixed(2);
           
           let balSubText = net === 0 ? 'SETTLED' : (isPositive ? 'കിട്ടാനുണ്ട്' : 'കൊടുക്കാനുണ്ട്');
-          let statusBg = m.status === 'Active' ? 'bg-success text-white' : 'bg-warning text-dark';
+
+          // Remove '+' symbol from mobile number if exists
+          let cleanPhone = m.phone ? m.phone.toString().replace(/^\+/, '').trim() : '';
+          let phoneHtml = cleanPhone ? `<div class="text-muted" style="font-size:0.75rem; margin-top:1px;"><i class="bi bi-telephone-fill me-1 text-secondary"></i>${cleanPhone}</div>` : '';
 
           let cardHtml = `
             <div class="member-card ${cardClass} bg-body" onclick="showMemberTransactions('${m.id}', '${m.name}')" title="ക്ലിക്ക് ചെയ്ത് ${m.name}-ന്റെ ചിലവുകൾ കാണുക">
               <div class="d-flex justify-content-between align-items-start mb-2">
                 <div>
                   <span class="fw-bold text-body fs-6 me-1">${m.name}</span>
-                  <span class="badge ${statusBg} rounded-pill" style="font-size:10px;">${m.status}</span>
+                  ${phoneHtml}
                 </div>
                 <div class="text-end">
                   <div class="balance-badge ${badgeClass}">${balText}</div>
