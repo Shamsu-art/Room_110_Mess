@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="ml" data-bs-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>BIN HUMAIDAN ROOM 110</title>
+  
+  <!-- Bootstrap 5 CSS & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  
+  <style>
+    :root {
+      --bg-color: #f4f6f9;
+      --card-radius: 16px;
+      --primary-gradient: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    }
+
+    [data-bs-theme="dark"] {
+      --bg-color: #121212;
+      --primary-gradient: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    }
+
+    body {
+      background-color: var(--bg-color);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      padding-bottom: 30px;
+      transition: background-color 0.3s ease;
+    }
+
+    .app-header {
+      background: var(--primary-gradient);
+      color: white;
+      padding: 20px 16px 36px 16px;
+      border-bottom-left-radius: 24px;
+      border-bottom-right-radius: 24px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+      position: relative;
+    }
+
+    .theme-toggle-btn {
+      position: absolute;
+      top: 45px;
+      right: 18px;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(5px);
+    }
+
+    .main-container {
+      margin-top: -24px;
+      padding: 0 12px;
+    }
+
+    .card-custom {
+      border-radius: var(--card-radius);
+      border: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .summary-box {
+      padding: 14px 10px;
+      border-radius: 12px;
+      background-color: rgba(13, 110, 253, 0.05);
+      cursor: pointer;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+    .summary-box:active { transform: scale(0.97); }
+    .summary-box:hover { background-color: rgba(13, 110, 253, 0.1); }
+
+    .member-card {
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      border: 1.5px solid transparent;
+      cursor: pointer;
+    }
+    .member-card:active { transform: scale(0.98); }
+    .member-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    
+    .member-card.positive { 
+      border: 2.5px solid rgba(25, 135, 84, 0.4); 
+      background-color: rgba(25, 135, 84, 0.03) !important;
+    }
+
+    .member-card.negative { 
+      border: 2.5px solid rgba(220, 53, 69, 0.4); 
+      background-color: rgba(220, 53, 69, 0.03) !important;
+    }
+
+    .balance-badge {
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 6px 12px;
+      border-radius: 20px;
+    }
+    .balance-badge.pos { background-color: rgba(25, 135, 84, 0.15); color: #198754; }
+    .balance-badge.neg { background-color: rgba(220, 53, 69, 0.15); color: #dc3545; }
+
+    .stat-label {
+      font-size: 0.72rem;
+      color: #888;
+      margin-bottom: 2px;
+      text-transform: uppercase;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .stat-value {
+      font-size: 0.9rem;
+      font-weight: 700;
+    }
+
+    .loader {
+      text-align: center;
+      padding: 30px;
+      font-weight: 600;
+      color: #0d6efd;
+    }
+
+    @media print {
+      .app-header, .theme-toggle-btn, .month-card, #searchContainer {
+        display: none !important;
+      }
+      body { background: white; color: black; }
+      .main-container { margin-top: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- App Header -->
+  <div class="app-header text-center">
+    <button class="theme-toggle-btn" onclick="toggleTheme()" id="themeBtn">
+      <i class="bi bi-moon-stars-fill"></i>
+    </button>
+    <div class="d-flex align-items-center justify-content-center gap-2">
+      <i class="bi bi-building-fill-gear fs-3"></i>
+      <h5 class="fw-bold m-0">BIN HUMAIDAN ROOM 110 MESS</h5>
+    </div>
+    <p class="small text-white-50 m-0 mt-1">Real-Time Statement and Monthly Report</p>
+  </div>
+
+  <div class="container main-container">
+    
+    <!-- Month Selector & Status Badge -->
+    <div class="card card-custom p-3 mb-3 bg-body">
+      <div class="d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-2">
+          <span class="fw-bold small text-secondary">
+            <i class="bi bi-calendar3 text-primary"></i>
+          </span>
+          <select id="monthSelect" class="form-select form-select-sm w-auto fw-bold text-primary border-1" onchange="onMonthChange()">
+            <option value="">Loading...</option>
+          </select>
+          <span id="monthStatusBadge" class="badge rounded-pill d-none"></span>
+        </div>
+        <button class="btn btn-sm btn-outline-secondary" onclick="window.print()" title="Print Statement">
+          <i class="bi bi-printer"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Overall Summary Cards (Clickable) -->
+    <div class="card card-custom p-3 mb-3 bg-body">
+      <div class="row g-2 text-center">
+        <div class="col-6">
+          <div class="summary-box" onclick="showAllExpensesModal()" title="ക്ലിക്ക് ചെയ്ത് മുഴുവൻ ചിലവുകളും കാണുക">
+            <div class="stat-label text-truncate"><i class="bi bi-cart-fill text-danger me-1"></i>TOTAL EXPENSES</div>
+            <div class="fs-6 fw-bold text-body mt-1" id="totalExpense">AED 0.00</div>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="summary-box" onclick="showAllPaymentsModal()" title="ക്ലിക്ക് ചെയ്ത് കളക്ഷൻ വിവരങ്ങൾ കാണുക">
+            <div class="stat-label text-truncate"><i class="bi bi-wallet2 text-success me-1"></i>TOTAL COLLECTED</div>
+            <div class="fs-6 fw-bold text-success mt-1" id="totalPayments">AED 0.00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Box -->
+    <div class="mb-3" id="searchContainer">
+      <div class="input-group input-group-sm">
+        <span class="input-group-text bg-body border-end-0"><i class="bi bi-search text-muted"></i></span>
+        <input type="text" id="searchInput" class="form-control border-start-0 bg-body" placeholder="അംഗങ്ങളുടെ പേര് തിരയുക..." onkeyup="filterMembers()">
+      </div>
+    </div>
+
+    <!-- Members Statement Section -->
+    <div class="d-flex align-items-center justify-content-between mb-2 px-1">
+      <h6 class="fw-bold m-0 text-secondary"><i class="bi bi-people-fill me-1"></i>അംഗങ്ങളുടെ കണക്ക്</h6>
+      <span class="badge bg-body text-secondary border rounded-pill" id="memberCount">0 അംഗങ്ങൾ</span>
+    </div>
+
+    <!-- Member Cards List Container -->
+    <div id="memberListContainer">
+      <div class="card card-custom loader bg-body">
+        <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+        Loading Data.....
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 👤 GENERAL POPUP MODAL -->
+  <div class="modal fade" id="memberModal" tabindex="-1" aria-labelledby="memberModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content rounded-4 border-0 shadow">
+        <div class="modal-header py-2 bg-body d-flex justify-content-between align-items-center border-bottom">
+          <div>
+            <h6 class="modal-title fw-bold text-body m-0" id="memberModalLabel">
+              <i class="bi bi-person-lines-fill text-primary me-1"></i> Details
+            </h6>
+            <small class="text-muted" id="memberModalSubTitle" style="font-size:0.75rem;"></small>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-3 bg-body" style="max-height: 450px; overflow-y: auto;">
+          <div id="memberTxList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🖼️ INVOICE POPUP MODAL -->
+  <div class="modal fade" id="invoiceModal" tabindex="-1" aria-labelledby="invoiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content rounded-4 border-0 shadow">
+        <div class="modal-header py-2 bg-body d-flex justify-content-between align-items-center">
+          <h6 class="modal-title fw-bold text-body m-0" id="invoiceModalLabel">
+            <i class="bi bi-file-earmark-text text-primary me-1"></i> Invoice
+          </h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body p-0 text-center bg-dark rounded-bottom-4 position-relative" style="min-height: 480px;">
+          <div id="modalSpinner" class="position-absolute top-50 start-50 translate-middle text-white">
+            <div class="spinner-border spinner-border-sm me-2" role="status"></div> Loading Invoice...
+          </div>
+          <iframe id="invoiceIframe" src="" style="width:100%; height:480px; border:none;" onload="document.getElementById('modalSpinner').style.display='none';"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🔄 LOADING POPUP MODAL -->
+  <div class="modal fade" id="loadingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content rounded-4 border-0 shadow text-center p-4 bg-body">
+        <div class="spinner-border text-primary mx-auto mb-3" style="width: 3rem; height: 3rem;" role="status"></div>
+        <h6 class="fw-bold text-body mb-1" id="loadingModalTitle">വിവരങ്ങൾ ശേഖരിക്കുന്നു...</h6>
+        <p class="text-muted small m-0">ദയവായി കാത്തിരിക്കുക</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // 👇 നിങ്ങളുടെ Apps Script വെബ് ആപ്പ് ലിങ്ക് ഇവിടെ നൽകുക 👇
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyytuIlwwlONdsnMe6nQEsoKx3Tv2jgxZgEK9od_lu5r4yN885VDw_y_5UgtR0xVE1MLg/exec';
+
+    var globalSummaryData = [];
+    var globalExpensesData = [];
+    var globalPaymentsData = [];
+    var globalIdToNameMap = {};
+    var myInvoiceModal = null;
+    var myMemberModal = null;
+    var myLoadingModal = null;
+
+    window.onload = function() {
+      let modalEl = document.getElementById('loadingModal');
+      if (modalEl) {
+        myLoadingModal = new bootstrap.Modal(modalEl);
+      }
+      loadData(null);
+    };
+
+    function toggleTheme() {
+      let currentTheme = document.documentElement.getAttribute('data-bs-theme');
+      let newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-bs-theme', newTheme);
+      
+      let btnIcon = document.getElementById('themeBtn');
+      btnIcon.innerHTML = newTheme === 'dark' ? '<i class="bi bi-sun-fill"></i>' : '<i class="bi bi-moon-stars-fill"></i>';
+    }
+
+    function formatMonthDisplay(mStr) {
+      if (!mStr) return '';
+      let parts = mStr.toString().trim().split(/[-/]/);
+      if (parts.length === 2) {
+        let monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        let mNum, year;
+        if (parts[0].length === 4) {
+          year = parts[0];
+          mNum = parseInt(parts[1], 10);
+        } else {
+          mNum = parseInt(parts[0], 10);
+          year = parts[1];
+        }
+        if (mNum >= 1 && mNum <= 12) {
+          return monthNames[mNum - 1] + " " + year;
+        }
+      }
+      return mStr;
+    }
+
+    function loadData(month) {
+      let displayMonthText = month ? formatMonthDisplay(month) : "വിവരങ്ങൾ";
+      let titleElem = document.getElementById('loadingModalTitle');
+      if (titleElem) {
+        titleElem.innerText = month ? `${displayMonthText}-ലെ വിവരങ്ങൾ ശേഖരിക്കുന്നു...` : `വിവരങ്ങൾ ശേഖരിക്കുന്നു...`;
+      }
+      
+      if (myLoadingModal) {
+        myLoadingModal.show();
+      }
+
+      document.getElementById('memberListContainer').innerHTML = `
+        <div class="card card-custom loader bg-body">
+          <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+          Loading Data...
+        </div>`;
+      document.getElementById('monthSelect').disabled = true;
+      
+      let requestUrl = API_URL;
+      if (month) {
+        requestUrl += '?month=' + encodeURIComponent(month);
+      }
+
+      fetch(requestUrl)
+        .then(response => response.json())
+        .then(data => {
+          renderDashboard(data);
+        })
+        .catch(error => {
+          showError({ message: error.message });
+        });
+    }
+
+    function showError(error) {
+      if (myLoadingModal) {
+        myLoadingModal.hide();
+      }
+      document.getElementById('monthSelect').disabled = false;
+      document.getElementById('memberListContainer').innerHTML = `
+        <div class="card card-custom p-3 text-center text-danger bg-body">
+          <i class="bi bi-exclamation-triangle-fill fs-2 mb-2"></i>
+          <strong>എറർ സംഭവിച്ചു:</strong><br><small>${error.message}</small>
+        </div>`;
+    }
+
+    function onMonthChange() {
+      let selectedMonth = document.getElementById('monthSelect').value;
+      if (selectedMonth) {
+        loadData(selectedMonth);
+      }
+    }
+
+    function filterMembers() {
+      let q = document.getElementById('searchInput').value.toLowerCase();
+      let filtered = globalSummaryData.filter(m => m.name.toLowerCase().includes(q));
+      renderMemberList(filtered);
+    }
+
+    function openInvoiceModal(url) {
+      if (!url) return;
+      document.getElementById('modalSpinner').style.display = 'block';
+      document.getElementById('invoiceIframe').src = url;
+
+      if (!myInvoiceModal) {
+        let modalEl = document.getElementById('invoiceModal');
+        myInvoiceModal = new bootstrap.Modal(modalEl);
+      }
+      myInvoiceModal.show();
+    }
+
+    function showAllExpensesModal() {
+      let container = document.getElementById('memberTxList');
+      document.getElementById('memberModalLabel').innerHTML = `<i class="bi bi-cart-fill text-danger me-1"></i> TOTAL MONTHLY EXPENSES`;
+      
+      let totalExp = globalExpensesData.reduce((sum, e) => sum + Number(e[5] || 0), 0);
+      document.getElementById('memberModalSubTitle').innerHTML = 
+        `Total Bills: <strong class="text-danger fw-bold">${globalExpensesData.length}</strong>  |   
+         Total Amount: <strong class="text-danger fw-bold">AED ${totalExp.toFixed(2)}</strong>`;
+
+      if (globalExpensesData.length === 0) {
+        container.innerHTML = `<div class="text-center text-muted py-4"><i class="bi bi-info-circle fs-3 d-block mb-2"></i>ഈ മാസത്തിൽ ചിലവുകളൊന്നും രേഖപ്പെടുത്തിയിട്ടില്ല.</div>`;
+      } else {
+        let html = '<ul class="list-group list-group-flush small">';
+        globalExpensesData.forEach(e => {
+          let date = e[1] ? e[1] : '-';
+          let item = e[3] || 'Expense';
+          let paidBy = e[4] || '-';
+          let amount = Number(e[5] || 0).toFixed(2);
+          let invoiceUrl = e[8] || '';
+
+          html += `
+            <li class="list-group-item px-0 py-2 border-bottom bg-transparent">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="fw-bold text-body fs-6">${item}</div>
+                  <div class="text-muted small mt-1">
+                    <i class="bi bi-person-fill text-secondary me-1"></i>Purchaser: <strong>${paidBy}</strong>
+                  </div>
+                  <div class="text-muted small mt-1" style="font-size:0.75rem;">
+                    <i class="bi bi-calendar-event me-1"></i>${date}
+                  </div>
+                </div>
+                <div class="text-end d-flex flex-column align-items-end">
+                  <span class="fw-bold text-danger fs-6">AED ${amount}</span>
+                  ${invoiceUrl ? `
+                    <button type="button" onclick="openInvoiceModal('${invoiceUrl}')" class="btn btn-sm btn-outline-primary py-0 px-2 rounded-pill mt-2" style="font-size:0.73rem;">
+                      <i class="bi bi-file-earmark-image me-1"></i> Invoice
+                    </button>
+                  ` : ''}
+                </div>
+              </div>
+            </li>`;
+        });
+        html += '</ul>';
+        container.innerHTML = html;
+      }
+
+      if (!myMemberModal) {
+        let modalEl = document.getElementById('memberModal');
+        myMemberModal = new bootstrap.Modal(modalEl);
+      }
+      myMemberModal.show();
+    }
+
+    function showAllPaymentsModal() {
+      let container = document.getElementById('memberTxList');
+      document.getElementById('memberModalLabel').innerHTML = `<i class="bi bi-wallet2 text-success me-1"></i> TOTAL COLLECTION DETAILS`;
+      
+      let totalColl = globalPaymentsData.reduce((sum, p) => sum + Number(p.amount || 0), 0);
+      document.getElementById('memberModalSubTitle').innerHTML = 
+        `Total Transactions: <strong class="text-success fw-bold">${globalPaymentsData.length}</strong>  |   
+         Total Collected: <strong class="text-success fw-bold">AED ${totalColl.toFixed(2)}</strong>`;
+
+      if (globalPaymentsData.length === 0) {
+        container.innerHTML = `<div class="text-center text-muted py-4"><i class="bi bi-info-circle fs-3 d-block mb-2"></i>ഈ മാസത്തിൽ കളക്ഷനുകൾ ഒന്നും രേഖപ്പെടുത്തിയിട്ടില്ല.</div>`;
+      } else {
+        let html = '<ul class="list-group list-group-flush small">';
+        globalPaymentsData.forEach(p => {
+          let noteHtml = p.note ? `<div class="text-muted mt-1" style="font-size:0.75rem;"><i class="bi bi-chat-left-text me-1"></i>${p.note}</div>` : '';
+
+          html += `
+            <li class="list-group-item px-0 py-2 border-bottom bg-transparent">
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="fw-bold text-body fs-6">
+                    <i class="bi bi-person-check-fill text-success me-1"></i>${p.name}
+                  </div>
+                  <div class="text-muted small mt-1" style="font-size:0.75rem;">
+                    <i class="bi bi-calendar-event me-1"></i>${p.date}
+                  </div>
+                  ${noteHtml}
+                </div>
+                <div class="text-end">
+                  <span class="fw-bold text-success fs-6">+ AED ${Number(p.amount).toFixed(2)}</span>
+                </div>
+              </div>
+            </li>`;
+        });
+        html += '</ul>';
+        container.innerHTML = html;
+      }
+
+      if (!myMemberModal) {
+        let modalEl = document.getElementById('memberModal');
+        myMemberModal = new bootstrap.Modal(modalEl);
+      }
+      myMemberModal.show();
+    }
+
+    function showMemberTransactions(memberId, memberName) {
+      if (!memberId) return;
+
+      let mIdTrim = memberId.toString().trim().toLowerCase();
+      let mNameTrim = memberName ? memberName.toString().trim().toLowerCase() : '';
+
+      let memberTx = globalExpensesData.filter(e => {
+        let paidBy = e[4] ? e[4].toString().trim().toLowerCase() : '';
+        let participants = e[7] ? e[7].toString().toLowerCase() : '';
+        
+        let isPayer = (paidBy === mIdTrim) || (mNameTrim && paidBy === mNameTrim);
+        let isParticipant = participants.includes(mIdTrim) || (mNameTrim && participants.includes(mNameTrim));
+
+        return isPayer || isParticipant;
+      });
+
+      let container = document.getElementById('memberTxList');
+      document.getElementById('memberModalLabel').innerHTML = `<i class="bi bi-person-fill text-primary me-1"></i> ${memberName}`;
+      
+      let totalPaidByMember = memberTx
+        .filter(e => {
+          let paidBy = e[4] ? e[4].toString().trim().toLowerCase() : '';
+          return (paidBy === mIdTrim) || (mNameTrim && paidBy === mNameTrim);
+        })
+        .reduce((sum, e) => sum + Number(e[5] || 0), 0);
+
+      document.getElementById('memberModalSubTitle').innerHTML = 
+        `Involved Bills: <strong class="text-primary fw-bold">${memberTx.length}</strong>  |   
+         Purchased Value: <strong class="text-success fw-bold">AED ${totalPaidByMember.toFixed(2)}</strong>`;
+
+      if (memberTx.length === 0) {
+        container.innerHTML = `<div class="text-center text-muted py-4"><i class="bi bi-info-circle fs-3 d-block mb-2"></i>ഈ മാസത്തിൽ ഇദ്ദേഹം ഉൾപ്പെട്ട ചിലവുകളൊന്നും രേഖപ്പെടുത്തിയിട്ടില്ല.</div>`;
+      } else {
+        let html = '<ul class="list-group list-group-flush small">';
+        memberTx.forEach(e => {
+          let date = e[1] ? e[1] : '-';
+          let item = e[3] || 'Expense';
+          let paidBy = e[4] || '-';
+          let amount = Number(e[5] || 0).toFixed(2);
+          let invoiceUrl = e[8] || '';
+          let isPayer = (paidBy.trim().toLowerCase() === mIdTrim) || (mNameTrim && paidBy.trim().toLowerCase() === mNameTrim);
+
+          html += `
+            <li class="list-group-item px-0 py-2 border-bottom bg-transparent">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="fw-bold text-body fs-6">
+                    ${item}
+                    ${isPayer 
+                      ? '<span class="badge bg-success-subtle text-success border border-success-subtle ms-1" style="font-size:0.65rem;">PURCHASED</span>' 
+                      : '<span class="badge bg-info-subtle text-info-emphasis border border-info-subtle ms-1" style="font-size:0.65rem;">SHARED</span>'}
+                  </div>
+                  <div class="text-muted small mt-1">
+                    <i class="bi bi-person-fill text-secondary me-1"></i>Purchaser: <strong>${paidBy}</strong>
+                  </div>
+                  <div class="text-muted small mt-1" style="font-size:0.75rem;">
+                    <i class="bi bi-calendar-event me-1"></i>${date}
+                  </div>
+                </div>
+                <div class="text-end d-flex flex-column align-items-end">
+                  <span class="fw-bold text-primary fs-6">AED ${amount}</span>
+                  ${invoiceUrl ? `
+                    <button type="button" onclick="openInvoiceModal('${invoiceUrl}')" class="btn btn-sm btn-outline-primary py-0 px-2 rounded-pill mt-2" style="font-size:0.73rem;">
+                      <i class="bi bi-file-earmark-image me-1"></i> Invoice
+                    </button>
+                  ` : ''}
+                </div>
+              </div>
+            </li>`;
+        });
+        html += '</ul>';
+        container.innerHTML = html;
+      }
+
+      if (!myMemberModal) {
+        let modalEl = document.getElementById('memberModal');
+        myMemberModal = new bootstrap.Modal(modalEl);
+      }
+      myMemberModal.show();
+    }
+
+    function renderDashboard(data) {
+      if (myLoadingModal) {
+        setTimeout(() => {
+          myLoadingModal.hide();
+        }, 300);
+      }
+
+      document.getElementById('monthSelect').disabled = false;
+      globalExpensesData = data.recentExpenses || [];
+
+      let summaryMembers = data.summary || [];
+      globalIdToNameMap = {};
+      summaryMembers.forEach(m => {
+        globalIdToNameMap[m.id.toLowerCase()] = m.name;
+      });
+
+      globalPaymentsData = [];
+      if (data.allPayments && data.allPayments.length > 0) {
+        data.allPayments.forEach(p => {
+          let payMonth = p[2] ? String(p[2]).trim() : '';
+          if (payMonth === data.selectedMonth) {
+            let memberIdOrName = p[3] ? String(p[3]).trim() : '';
+            let resolvedName = globalIdToNameMap[memberIdOrName.toLowerCase()] || memberIdOrName;
+            let date = p[1] ? p[1] : (p[0] ? p[0] : '-');
+            let amount = parseFloat(String(p[4]).replace(/,/g, '')) || 0;
+            let note = p[5] ? String(p[5]).trim() : '';
+
+            if (amount > 0) {
+              globalPaymentsData.push({
+                date: date,
+                name: resolvedName,
+                amount: amount,
+                note: note
+              });
+            }
+          }
+        });
+      }
+
+      if (data.availableMonths && data.availableMonths.length > 0) {
+        data.availableMonths.sort((a, b) => {
+          let parseDate = (mStr) => {
+            let parts = mStr.toString().trim().split(/[-/]/);
+            if (parts[0].length === 4) {
+              return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1);
+            } else {
+              return new Date(parseInt(parts[1], 10), parseInt(parts[0], 10) - 1);
+            }
+          };
+          return parseDate(b) - parseDate(a);
+        });
+      }
+
+      let select = document.getElementById('monthSelect');
+      select.innerHTML = '';
+      data.availableMonths.forEach(m => {
+        let opt = document.createElement('option');
+        opt.value = m;
+        opt.innerText = formatMonthDisplay(m);
+        if (m === data.selectedMonth) opt.selected = true;
+        select.appendChild(opt);
+      });
+
+      document.getElementById('totalExpense').innerText = 'AED ' + data.totalExpenseMonth.toFixed(2);
+      document.getElementById('totalPayments').innerText = 'AED ' + data.totalPaymentsMonth.toFixed(2);
+
+      globalSummaryData = summaryMembers.filter(m => {
+        return (m.spent > 0 || m.paid > 0 || m.share > 0 || Math.abs(m.netBalance) > 0.01);
+      });
+
+      renderMemberList(globalSummaryData);
+
+      let badge = document.getElementById('monthStatusBadge');
+      let now = new Date();
+      let currentMonthNum = (now.getMonth() + 1).toString().padStart(2, '0');
+      let currentYearNum = now.getFullYear().toString();
+      
+      let isCurrentMonth = data.selectedMonth.includes(currentMonthNum + "-" + currentYearNum) || 
+                           data.selectedMonth.includes(currentYearNum + "-" + currentMonthNum) ||
+                           data.selectedMonth === data.availableMonths[0];
+
+      let isSettled = globalSummaryData.length > 0 && globalSummaryData.every(m => Math.abs(m.netBalance) < 0.01);
+
+      if (isCurrentMonth) {
+        badge.className = "badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-1";
+        badge.innerHTML = '<i class="bi bi-play-circle-fill me-1"></i>ACTIVE';
+      } else if (isSettled) {
+        badge.className = "badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-1";
+        badge.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>CLOSED';
+      } else {
+        badge.className = "badge bg-warning-subtle text-warning-emphasis border border-warning-subtle rounded-pill px-2 py-1";
+        badge.innerHTML = '<i class="bi bi-clock-history me-1"></i>PENDING';
+      }
+      badge.classList.remove('d-none');
+    }
+
+    function renderMemberList(summaryList) {
+      let container = document.getElementById('memberListContainer');
+      container.innerHTML = '';
+
+      if (!summaryList || summaryList.length === 0) {
+        container.innerHTML = '<div class="card card-custom p-3 text-center text-muted bg-body"> ഈ മാസത്തെ ചിലവുകൾ രേഖപ്പെടുത്തത് കാരണം അംഗങ്ങളുടെ വിവരങ്ങൾ ലഭ്യമല്ല.</div>';
+        document.getElementById('memberCount').innerText = '0 അംഗങ്ങൾ';
+      } else {
+        document.getElementById('memberCount').innerText = summaryList.length + ' അംഗങ്ങൾ';
+
+        summaryList.forEach(m => {
+          let net = Math.round((m.netBalance || 0) * 100) / 100;
+          if (Object.is(net, -0)) net = 0;
+
+          let isPositive = net >= 0; 
+          let cardClass = isPositive ? 'positive' : 'negative';
+          let badgeClass = isPositive ? 'pos' : 'neg';
+          let balSign = net > 0 ? '+' : (net < 0 ? '-' : '');
+          let balText = balSign + 'AED ' + Math.abs(net).toFixed(2);
+          
+          let balSubText = net === 0 ? 'SETTLED' : (isPositive ? 'കിട്ടാനുണ്ട്' : 'കൊടുക്കാനുണ്ട്');
+          let statusBg = m.status === 'Active' ? 'bg-success text-white' : 'bg-warning text-dark';
+
+          let cardHtml = `
+            <div class="member-card ${cardClass} bg-body" onclick="showMemberTransactions('${m.id}', '${m.name}')" title="ക്ലിക്ക് ചെയ്ത് ${m.name}-ന്റെ ചിലവുകൾ കാണുക">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                  <span class="fw-bold text-body fs-6 me-1">${m.name}</span>
+                  <span class="badge ${statusBg} rounded-pill" style="font-size:10px;">${m.status}</span>
+                </div>
+                <div class="text-end">
+                  <div class="balance-badge ${badgeClass}">${balText}</div>
+                  <div style="font-size: 0.70rem; margin-top:2px;" class="text-muted fw-bold">${balSubText}</div>
+                </div>
+              </div>
+
+              <div class="row g-1 text-center mt-2 pt-2 border-top">
+                <div class="col-4 border-end">
+                  <div class="stat-label">PURCHASED</div>
+                  <div class="stat-value text-body">AED ${m.spent.toFixed(2)}</div>
+                </div>
+                <div class="col-4 border-end">
+                  <div class="stat-label text-success">PAID</div>
+                  <div class="stat-value text-success">AED ${m.paid.getvalue ? '' : m.paid.toFixed(2)}</div>
+                </div>
+                <div class="col-4">
+                  <div class="stat-label text-danger">SHARE</div>
+                  <div class="stat-value text-danger">AED ${m.share.toFixed(2)}</div>
+                </div>
+              </div>
+            </div>`;
+
+          container.innerHTML += cardHtml;
+        });
+      }
+    }
+  </script>
+</body>
+</html>
