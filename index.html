@@ -630,7 +630,9 @@
       });
 
       document.getElementById('totalExpense').innerText = 'AED ' + data.totalExpenseMonth.toFixed(2);
-      document.getElementById('totalPayments').innerText = 'AED ' + data.totalPaymentsMonth.toFixed(2);
+      let roundedPayments = Math.round((data.totalPaymentsMonth || 0) * 100) / 100;
+if (Math.abs(roundedPayments) < 0.005) roundedPayments = 0;
+document.getElementById('totalPayments').innerText = 'AED ' + roundedPayments.toFixed(2);
 
       globalSummaryData = summaryMembers.filter(m => {
         return (m.spent > 0 || m.paid > 0 || m.share > 0 || Math.abs(m.netBalance) > 0.01);
