@@ -630,16 +630,11 @@
       });
 
       document.getElementById('totalExpense').innerText = 'AED ' + data.totalExpenseMonth.toFixed(2);
-
-// globalPaymentsData-ൽ ഉള്ള തുകകൾ മാത്രം കൂട്ടി കൃത്യമായ ടോട്ടൽ എടുക്കുന്നു
-let calculatedPayments = globalPaymentsData.reduce((sum, p) => sum + Number(p.amount || 0), 0);
-let roundedPayments = Math.round(calculatedPayments * 100) / 100;
-
-if (Math.abs(roundedPayments) < 0.005) {
-  roundedPayments = 0;
+      let totalCollectedRounded = Math.round((data.totalPaymentsMonth || 0) * 100) / 100;
+if (Math.abs(totalCollectedRounded) < 0.005) {
+  totalCollectedRounded = 0;
 }
-
-document.getElementById('totalPayments').innerText = 'AED ' + roundedPayments.toFixed(2);
+document.getElementById('totalPayments').innerText = 'AED ' + totalCollectedRounded.toFixed(2);
 
       globalSummaryData = summaryMembers.filter(m => {
         return (m.spent > 0 || m.paid > 0 || m.share > 0 || Math.abs(m.netBalance) > 0.01);
