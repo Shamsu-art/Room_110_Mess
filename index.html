@@ -630,11 +630,13 @@
       });
 
       document.getElementById('totalExpense').innerText = 'AED ' + data.totalExpenseMonth.toFixed(2);
+      
+      // പുതിയ മാറ്റം ഇവിടെ നൽകിയിരിക്കുന്നു
       let totalCollectedRounded = Math.round((data.totalPaymentsMonth || 0) * 100) / 100;
-if (Math.abs(totalCollectedRounded) < 0.005) {
-  totalCollectedRounded = 0;
-}
-document.getElementById('totalPayments').innerText = 'AED ' + totalCollectedRounded.toFixed(2);
+      if (Math.abs(totalCollectedRounded) < 0.005) {
+        totalCollectedRounded = 0;
+      }
+      document.getElementById('totalPayments').innerText = 'AED ' + totalCollectedRounded.toFixed(2);
 
       globalSummaryData = summaryMembers.filter(m => {
         return (m.spent > 0 || m.paid > 0 || m.share > 0 || Math.abs(m.netBalance) > 0.01);
